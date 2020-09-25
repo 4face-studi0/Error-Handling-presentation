@@ -9,7 +9,7 @@ import kotlin.text.RegexOption.IGNORE_CASE
 As default, we should expect that a function from general Kotlin code can throw an exception, unless differently
 specified by its name.
 We should not care about it and thus we should not plan a fallback strategy, unless we can totally recover from the
-error, take an action that will allow us to complete our process successfully.
+error and take an action that will allow us to complete our process successfully.
 
 Let's focus on the first case:
 Thinking about a login process, it will start from the user interaction and it will finish into a feedback for the user.
@@ -43,6 +43,22 @@ exception; here are 2 examples:
   `UploadAttachment.Result`
 
 In any case, the error handling must be as closest as possible to the presentation layer ( UI )
+
+As general rule, we should never ignore an exception:
+1) In the first case we have a default value and that is enough, it is an exception technically speaking, it is at the
+  scope of the function ( String.domain() ), it is for some low level components ( e.g. backend is expecting an explicit
+  domain ), but it's not an exception for our presentation layer ( user input ), since it's expected to be able to login
+  providing only the username, rather the full email address, but also in this case the exception handling should be dealt
+  with as close as possible to the presentation layer, like in the ViewModel for example, so low level components will
+  receive the right domain, rather than dealing with the absence of it and provide a default value in many places
+2) In the second case we're proving a fallback, a B plan, but if required we could keep track of it, and instead of
+  returning a `String`, we should return a `StringResult(content: String, usingDoh: Boolean)` or another kind of object
+3) In the third case we have the best scenario, as we are not only propagating the error, but we're also proving
+  more information with a custom object ( ofc that was just an example, we could have a better fine grained
+  handling )
+
+Anyways, never catch exceptions when not strictly required! It's always easier to introduce an error handling later,
+than remove it!
 
  */
 
